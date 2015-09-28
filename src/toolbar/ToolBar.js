@@ -99,6 +99,16 @@ class ToolBar extends React.Component{
             );
             break;
           case 'select':
+            return(
+              <div className="form-group" key={column.field}>
+                <label>{column.name}</label>
+                <select ref={column.field+i} className="form-control">
+                {addOptions.selects.map(function (val, idx) {
+                  return (<option>{val}</option>);
+                })}
+                </select>
+              </div>
+            );
             break;
           case 'checkbox':
             return(
