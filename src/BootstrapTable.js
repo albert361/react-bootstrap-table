@@ -225,6 +225,15 @@ class BootstrapTable extends React.Component{
   handleAddRow(newObj){
     let msg = null, result;
     try {
+      if (this.props.options.beforeInsertRow) {
+        var coloptions = this.props.children.map(function(column){
+          return {
+            field: column.props.dataField,
+            addOptions: column.props.addOptions,
+          };
+        });
+        this.props.options.beforeInsertRow(newObj, coloptions);
+      }
       this.store.add(newObj);
     } catch(e){
       return e;
@@ -333,7 +342,8 @@ class BootstrapTable extends React.Component{
       columns = this.props.children.map(function(column){
         return {
           name: column.props.children,
-          field: column.props.dataField
+          field: column.props.dataField,
+          addOptions: column.props.addOptions,
         };
       });
     } else {

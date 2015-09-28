@@ -121,6 +121,7 @@ export class TableDataStore{
   }
 
   add(newObj){
+    console.log(newObj);
     if(newObj[this.keyField].trim() === ""){
       throw this.keyField + " can't be empty value.";
     }
