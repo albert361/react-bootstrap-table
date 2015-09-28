@@ -43,9 +43,9 @@ class TableHeader extends React.Component{
 
     return(
       <div className={containerClasses}>
-        <table className="table table-hover table-bordered">
+        <table className="table table-bordered">
           <thead>
-            <tr ref="header">
+            <tr ref="header" className="success">
               {selectRowHeaderCol}
               {this.props.children}
             </tr>

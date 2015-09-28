@@ -54,16 +54,16 @@ class ToolBar extends React.Component{
   render(){
     var modalClassName = "bs-table-modal-md"+new Date().getTime();
     var insertBtn = this.props.enableInsert?
-          <button type="button" className="btn btn-default" data-toggle="modal" data-target={'.'+modalClassName} onClick={this.handleNewBtnClick.bind(this)}>
+          <button type="button" className="btn btn-primary" data-toggle="modal" data-target={'.'+modalClassName} onClick={this.handleNewBtnClick.bind(this)}>
             New</button>:null;
 
     var deleteBtn = this.props.enableDelete?
-          <button type="button" className="btn btn-default" data-toggle="tooltip" data-placement="right" title="Drop selected row"
+          <button type="button" className="btn btn-danger" data-toggle="tooltip" data-placement="right" title="Delete selected items"
             onClick={this.handleDropRowBtnClick.bind(this)}>
             Delete
           </button>:null;
     var searchTextInput = this.props.enableSearch?
-      <input type='text' placeholder={this.props.searchPlaceholder?this.props.searchPlaceholder:'Search'} onKeyUp={this.handleKeyUp.bind(this)}/>:null;
+      <input className="form-control" type='text' placeholder={this.props.searchPlaceholder?this.props.searchPlaceholder:'Search'} onKeyUp={this.handleKeyUp.bind(this)}/>:null;
     var modal = this.props.enableInsert?this.renderInsertRowModal(modalClassName):null;
     var warningStyle = {
       display: "none",
@@ -71,10 +71,18 @@ class ToolBar extends React.Component{
     };
     return(
       <div>
-        <div className="btn-group btn-group-sm" role="group" aria-label="...">
-          {insertBtn}{deleteBtn}
-        </div>
-        {searchTextInput}
+        <form className="form-horizontal">
+          <div className="row">
+            <div className="col-xs-8">
+              <div className="btn-group btn-group-sm" role="group" aria-label="...">
+                {insertBtn}{deleteBtn}
+              </div>
+            </div>
+            <div className="col-xs-4">
+              {searchTextInput}
+            </div>
+          </div>
+        </form>
         <div ref="warning" className="alert alert-warning" style={warningStyle}>
           <button type="button" className="close" aria-label="Close" onClick={this.handleCloseBtn.bind(this)}><span aria-hidden="true">&times;</span></button>
           <strong>Warning! </strong><font ref="warningText"></font>

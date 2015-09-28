@@ -125,6 +125,7 @@ class BootstrapTable extends React.Component{
         {toolBar}
         <div ref="table" style={style} className={tableClass}>
           <TableHeader rowSelectType={this.props.selectRow.mode}
+                       className={this.props.className}
                        hideSelectColumn={this.props.selectRow.hideSelectColumn}
                        sortName={this.props.options.sortName}
                        sortOrder={this.props.options.sortOrder}
@@ -133,6 +134,7 @@ class BootstrapTable extends React.Component{
             {this.props.children}
           </TableHeader>
           <TableBody ref="body" data={this.state.data} columns={columns}
+            className={this.props.className}
             striped={this.props.striped}
             hover={this.props.hover}
             keyField={this.store.getKeyField()}
