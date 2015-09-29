@@ -125,7 +125,6 @@ class BootstrapTable extends React.Component{
         {toolBar}
         <div ref="table" style={style} className={tableClass}>
           <TableHeader rowSelectType={this.props.selectRow.mode}
-                       className={this.props.className}
                        hideSelectColumn={this.props.selectRow.hideSelectColumn}
                        sortName={this.props.options.sortName}
                        sortOrder={this.props.options.sortOrder}
@@ -134,7 +133,6 @@ class BootstrapTable extends React.Component{
             {this.props.children}
           </TableHeader>
           <TableBody ref="body" data={this.state.data} columns={columns}
-            className={this.props.className}
             striped={this.props.striped}
             hover={this.props.hover}
             keyField={this.store.getKeyField()}
@@ -262,7 +260,39 @@ class BootstrapTable extends React.Component{
     }
   }
 
-  handleDropRow(){
+  handleEditRow(newObj) {
+    try {
+      if (this.props.options.beforeEditRow) {
+        var coloptions = this.props.children.map(function(column){
+          return {
+            field: column.props.dataField,
+            addOptions: column.props.addOptions,
+          };
+        });
+        this.props.options.beforeEditRow(newObj, coloptions);
+      }
+      if(this.props.options.afterEditRow){
+        this.props.options.afterEditRow(newObj);
+      }
+      this.setState({
+        data: this.store.get()
+      });
+    } catch(e){
+      return e;
+    }
+  }
+
+  handlePrepareEdit(callback) {
+    let editRowKeys = this.store.getSelectedRowKeys();
+    if (editRowKeys.length != 1) {
+      throw 'Currenty only support one row edit.';
+      return;
+    }
+    let item = this.store.getByKey(editRowKeys[0]);
+    return item;
+  }
+
+  doDropRow(){
     let result;
     let dropRowKeys = this.store.getSelectedRowKeys();
 
@@ -290,6 +320,17 @@ class BootstrapTable extends React.Component{
     }
     if(this.props.options.afterDeleteRow){
       this.props.options.afterDeleteRow(dropRowKeys);
+    }
+  }
+
+  handleDropRow(){
+    let dropRowKeys = this.store.getSelectedRowKeys();
+    if (this.props.options.beforeDeleteRow) {
+      this.props.options.beforeDeleteRow(dropRowKeys, function(drop) {
+        if (drop) this.doDropRow();
+      }.bind(this));
+    } else {
+      this.doDropRow();
     }
   }
 
@@ -358,11 +399,14 @@ class BootstrapTable extends React.Component{
       return(
         <div className="tool-bar">
           <ToolBar enableInsert={this.props.insertRow}
+                   enableEdit={this.props.editRow}
                    enableDelete={this.props.deleteRow}
                    enableSearch={this.props.search}
                    columns={columns}
                    searchPlaceholder={this.props.searchPlaceholder}
                    onAddRow={this.handleAddRow.bind(this)}
+                   onPrepareEditRow={this.handlePrepareEdit.bind(this)}
+                   onEditRow={this.handleEditRow.bind(this)}
                    onDropRow={this.handleDropRow.bind(this)}
                    onSearch={this.handleSearch.bind(this)}/>
         </div>

@@ -9,18 +9,18 @@ class ToolBar extends React.Component{
     this.state = {
       isInsertRowTrigger: true
     };
+    this.editMode = false;
+    this.state.item = {};
   }
 
   handleNewBtnClick(e) {
-    setTimeout(function() {
-      $.each($('.insertModal').find('input'), function(idx, ele) {
-        $(ele).val('');
-      });
-    }, 0);
+    this.editMode = false;
+    this.state.item = {};
+    this.setState(this.state);
   }
 
   handleSaveBtnClick(e){
-    var newObj = {};
+    var newObj = (this.editMode) ? this.state.item : {};
     this.props.columns.forEach(function(column, i){
       if (column.addOptions && (column.addOptions.type == 'checkbox')) {
         newObj[column.field] = this.refs[column.field+i].getDOMNode().checked;
@@ -28,15 +28,29 @@ class ToolBar extends React.Component{
         newObj[column.field] = this.refs[column.field+i].getDOMNode().value;
       }
     }, this);
-    console.log('handleSaveBtnClick ' + newObj);
-    var msg = this.props.onAddRow(newObj);
-    if(msg) {
+
+    var msg;
+    if (this.editMode) {
+      msg = this.props.onEditRow(newObj);
+    } else {
+      msg = this.props.onAddRow(newObj);
+    }
+
+    if (msg) {
       this.refs.insertWarning.getDOMNode().style.display = "block";
       this.refs.insertWarningText.getDOMNode().textContent = msg;
     } else{
       this.refs.insertWarning.getDOMNode().style.display = "none";
       setTimeout(function() {$('.insertModal').modal('hide');}, 0);
+      this.editMode = false;
+      this.state.item = {};
     }
+  }
+
+  handleEditBtnClick(e){
+    this.editMode = true;
+    this.state.item = this.props.onPrepareEditRow();
+    this.setState(this.state);
   }
 
   handleDropRowBtnClick(e){
@@ -57,6 +71,10 @@ class ToolBar extends React.Component{
           <button type="button" className="btn btn-primary" data-toggle="modal" data-target={'.'+modalClassName} onClick={this.handleNewBtnClick.bind(this)}>
             New</button>:null;
 
+    var editBtn = this.props.enableEdit?
+          <button type="button" className="btn btn-warning" data-toggle="modal" data-target={'.'+modalClassName} onClick={this.handleEditBtnClick.bind(this)}>
+            Edit</button>:null;
+
     var deleteBtn = this.props.enableDelete?
           <button type="button" className="btn btn-danger" data-toggle="tooltip" data-placement="right" title="Delete selected items"
             onClick={this.handleDropRowBtnClick.bind(this)}>
@@ -75,7 +93,7 @@ class ToolBar extends React.Component{
           <div className="row">
             <div className="col-xs-8">
               <div className="btn-group btn-group-sm" role="group" aria-label="...">
-                {insertBtn}{deleteBtn}
+                {insertBtn}{editBtn}{deleteBtn}
               </div>
             </div>
             <div className="col-xs-4">
@@ -102,7 +120,7 @@ class ToolBar extends React.Component{
             return(
               <div className="form-group" key={column.field}>
                 <label>{column.name}</label>
-                <input ref={column.field+i} type="text" className="form-control" placeholder={column.name}></input>
+                <input ref={column.field+i} type="text" className="form-control" placeholder={column.name} value={this.state.item[column.field]}></input>
               </div>
             );
             break;
@@ -112,8 +130,12 @@ class ToolBar extends React.Component{
                 <label>{column.name}</label>
                 <select ref={column.field+i} className="form-control">
                 {addOptions.selects.map(function (val, idx) {
-                  return (<option>{val}</option>);
-                })}
+                  if (val.id == this.state.item[column.field]) {
+                    return (<option value={val.id} selected="selected">{val.name}</option>);
+                  } else {
+                    return (<option value={val.id}>{val.name}</option>);
+                  }
+                }.bind(this))}
                 </select>
               </div>
             );
@@ -122,7 +144,7 @@ class ToolBar extends React.Component{
             return(
               <div className="form-group" key={column.field}>
                 <label>{column.name}</label>
-                <input ref={column.field+i} type="checkbox" className="form-control"></input>
+                <input ref={column.field+i} type="checkbox" className="form-control" checked={this.state.item[column.field]}></input>
               </div>
             );
             break;
@@ -134,7 +156,7 @@ class ToolBar extends React.Component{
           </div>
         );
       }
-    });
+    }.bind(this));
     var modalClass = classSet("modal", "fade", modalClassName, "insertModal");
     var warningStyle = {
       display: "none",
@@ -169,6 +191,7 @@ ToolBar.propTypes = {
   onAddRow: React.PropTypes.func,
   onDropRow: React.PropTypes.func,
   enableInsert: React.PropTypes.bool,
+  enableEdit: React.PropTypes.bool,
   enableDelete: React.PropTypes.bool,
   enableSearch: React.PropTypes.bool,
   columns: React.PropTypes.array,
@@ -177,6 +200,7 @@ ToolBar.propTypes = {
 
 ToolBar.defaultProps = {
   enableInsert: false,
+  enableEdit: false,
   enableDelete: false,
   enableSearch: false
 }
