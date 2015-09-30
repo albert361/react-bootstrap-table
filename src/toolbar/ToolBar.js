@@ -11,6 +11,7 @@ class ToolBar extends React.Component{
     };
     this.editMode = false;
     this.state.item = {};
+    this.columns = {};
   }
 
   handleNewBtnClick(e) {
@@ -50,6 +51,16 @@ class ToolBar extends React.Component{
   handleEditBtnClick(e){
     this.editMode = true;
     this.state.item = this.props.onPrepareEditRow();
+    for (var k in this.state.item) {
+      if (this.columns[k] && this.columns[k].addOptions.clearOnEdit) {
+        this.state.item[k] = '';
+      }
+    }
+    this.setState(this.state);
+  }
+
+  onChange(field, e) {
+    this.state.item[field] = e.target.value;
     this.setState(this.state);
   }
 
@@ -111,8 +122,9 @@ class ToolBar extends React.Component{
   }
 
   renderInsertRowModal(modalClassName){
-
+    this.columns = {};
     var inputField = this.props.columns.map(function(column, i){
+      this.columns[column.field] = column;
       var addOptions = column.addOptions || {};
       if (!addOptions.hidden) {
         switch (addOptions.type) {
@@ -120,7 +132,7 @@ class ToolBar extends React.Component{
             return(
               <div className="form-group" key={column.field}>
                 <label>{column.name}</label>
-                <input ref={column.field+i} type="text" className="form-control" placeholder={column.name} value={this.state.item[column.field]}></input>
+                <input ref={column.field+i} type="text" className="form-control" placeholder={column.name} value={this.state.item[column.field]} onChange={this.onChange.bind(this, column.field)}></input>
               </div>
             );
             break;
@@ -152,18 +164,18 @@ class ToolBar extends React.Component{
       } else {
         return  (
           <div className="form-group" key={column.field}>
-            <input ref={column.field+i} type="hidden" className="form-control" placeholder={column.name}></input>
+            <input ref={column.field+i} type="hidden" className="form-control" placeholder={column.name} value={this.state.item[column.field]}></input>
           </div>
         );
       }
     }.bind(this));
-    var modalClass = classSet("modal", "fade", modalClassName, "insertModal");
+    var modalClass = classSet("modal", "fade", modalClassName, "insertModal", "in");
     var warningStyle = {
       display: "none",
       marginBottom: 0
     };
     return (
-      <div className={modalClass} tabIndex="-1" role="dialog" aria-hidden="true">
+      <div className={modalClass} tabIndex="-1" role="dialog" aria-hidden="false">
         <div className="modal-dialog modal-md">
           <div className="modal-content">
             <div className="modal-header">
