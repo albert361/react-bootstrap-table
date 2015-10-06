@@ -18,6 +18,13 @@ class ToolBar extends React.Component{
     this.editMode = false;
     this.state.item = {};
     this.setState(this.state);
+    this.props.columns.forEach(function(column, i){
+      if (column.addOptions && (column.addOptions.type == 'checkbox')) {
+        this.refs[column.field+i].getDOMNode().checked = false;
+      } else {
+        this.refs[column.field+i].getDOMNode().value = '';
+      }
+    }, this);
   }
 
   handleSaveBtnClick(e){
@@ -51,8 +58,9 @@ class ToolBar extends React.Component{
   handleEditBtnClick(e){
     this.editMode = true;
     this.state.item = this.props.onPrepareEditRow();
+    console.log(this.state.item);
     for (var k in this.state.item) {
-      if (this.columns[k] && this.columns[k].addOptions.clearOnEdit) {
+      if (this.columns[k] && this.columns[k].addOptions && this.columns[k].addOptions.clearOnEdit) {
         this.state.item[k] = '';
       }
     }
@@ -93,7 +101,7 @@ class ToolBar extends React.Component{
           </button>:null;
     var searchTextInput = this.props.enableSearch?
       <input className="form-control" type='text' placeholder={this.props.searchPlaceholder?this.props.searchPlaceholder:'Search'} onKeyUp={this.handleKeyUp.bind(this)}/>:null;
-    var modal = this.props.enableInsert?this.renderInsertRowModal(modalClassName):null;
+    var modal = (this.props.enableInsert || this.props.enableEdit)?this.renderInsertRowModal(modalClassName):null;
     var warningStyle = {
       display: "none",
       marginBottom: 0
@@ -125,7 +133,7 @@ class ToolBar extends React.Component{
     this.columns = {};
     var inputField = this.props.columns.map(function(column, i){
       this.columns[column.field] = column;
-      var addOptions = column.addOptions || {};
+      var addOptions = column.addOptions || {type: 'text', hidden: false};
       if (!addOptions.hidden) {
         switch (addOptions.type) {
           case 'text':
@@ -160,6 +168,13 @@ class ToolBar extends React.Component{
               </div>
             );
             break;
+          case 'multiline':
+            return (
+              <div className="form-group" key={column.field}>
+                <label>{column.name}</label>
+                <textarea ref={column.field+i} className="form-control" rows={column.addOptions.lines} placeholder={column.name} value={this.state.item[column.field]} onChange={this.onChange.bind(this, column.field)}></textarea>
+              </div>
+            );
         }
       } else {
         return  (

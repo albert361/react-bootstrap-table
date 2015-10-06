@@ -140,7 +140,7 @@ export class TableDataStore{
   getByKey(rowKey){
     let currentDisplayData = this.getCurrentDisplayData();
     let result = currentDisplayData.filter(function(row){
-      return rowKey.indexOf(row[this.keyField]) == 0;
+      return rowKey == row[this.keyField];
     }, this);
     return result[0];
   }

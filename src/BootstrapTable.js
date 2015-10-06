@@ -395,7 +395,7 @@ class BootstrapTable extends React.Component{
         field: this.props.children.props.dataField
       }];
     }
-    if(this.props.insertRow || this.props.deleteRow || this.props.search){
+    if(this.props.insertRow || this.props.deleteRow || this.props.search || this.props.editRow){
       return(
         <div className="tool-bar">
           <ToolBar enableInsert={this.props.insertRow}
@@ -452,6 +452,7 @@ BootstrapTable.propTypes = {
     afterSaveCell: React.PropTypes.func
   }),
   insertRow: React.PropTypes.bool,
+  editRow: React.PropTypes.bool,
   deleteRow: React.PropTypes.bool,
   search: React.PropTypes.bool,
   columnFilter: React.PropTypes.bool,
@@ -486,6 +487,7 @@ BootstrapTable.defaultProps = {
     afterTableComplete: undefined
   },
   insertRow: false,
+  editRow: false,
   deleteRow: false,
   search: false,
   columnFilter: false,
