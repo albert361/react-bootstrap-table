@@ -15,6 +15,9 @@ class ToolBar extends React.Component{
   }
 
   handleNewBtnClick(e) {
+    if(this.props.onNewBtnClicked){
+      this.props.onNewBtnClicked();
+    }
     this.editMode = false;
     this.state.item = {};
     this.setState(this.state);
@@ -86,6 +89,17 @@ class ToolBar extends React.Component{
 
   render(){
     var modalClassName = "bs-table-modal-md"+new Date().getTime();
+    /* Customize Modal */
+    var useExtra = this.props.useExtra && this.props.useExtra==true ? true : false;
+    var modalItemsClass = 'col-sm-4';
+    var modalExtraClass = 'col-sm-8';
+    // var modalExtra = (<p>I am Extra contents.</p>); // this.props.extra...
+    var extraSettings = {
+      useExtra: useExtra,
+      modalItemsClass: modalItemsClass,
+      modalExtraClass: modalExtraClass,
+    }
+    /* Customize Modal - end */
     var insertBtn = this.props.enableInsert?
           <button type="button" className="btn btn-primary" data-toggle="modal" data-target={'.'+modalClassName} onClick={this.handleNewBtnClick.bind(this)}>
             New</button>:null;
@@ -101,7 +115,7 @@ class ToolBar extends React.Component{
           </button>:null;
     var searchTextInput = this.props.enableSearch?
       <input className="form-control" type='text' placeholder={this.props.searchPlaceholder?this.props.searchPlaceholder:'Search'} onKeyUp={this.handleKeyUp.bind(this)}/>:null;
-    var modal = (this.props.enableInsert || this.props.enableEdit)?this.renderInsertRowModal(modalClassName):null;
+    var modal = (this.props.enableInsert || this.props.enableEdit)?this.renderInsertRowModal(modalClassName, extraSettings):null;
     var warningStyle = {
       display: "none",
       marginBottom: 0
@@ -129,7 +143,7 @@ class ToolBar extends React.Component{
     )
   }
 
-  renderInsertRowModal(modalClassName){
+  renderInsertRowModal(modalClassName, extraSettings){
     this.columns = {};
     var inputField = this.props.columns.map(function(column, i){
       this.columns[column.field] = column;
@@ -189,16 +203,32 @@ class ToolBar extends React.Component{
       display: "none",
       marginBottom: 0
     };
+    var cx = React.addons.classSet;
+    var extraContent = (null);
+    var modalItemsClass = '';
+    var modalExtraClass = '';
+    if (extraSettings && extraSettings.useExtra) {
+      extraContent = this.props.extraContent();
+      modalItemsClass = extraSettings.modalItemsClass;
+      modalExtraClass = extraSettings.modalExtraClass;
+    }
     return (
       <div className={modalClass} tabIndex="-1" role="dialog" aria-hidden="false">
         <div className="modal-dialog modal-md">
           <div className="modal-content">
-            <div className="modal-header">
-              <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 className="modal-title">New Record</h4>
-            </div>
-            <div className="modal-body">
-              {inputField}
+            <div className="row">
+              <div className={modalItemsClass}>
+                <div className="modal-header">
+                  <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 className="modal-title">New Record</h4>
+                </div>
+                <div className="modal-body">
+                  {inputField}
+                </div>
+              </div>
+              <div className={modalExtraClass}>
+                {extraContent}
+              </div>
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>

@@ -349,6 +349,12 @@ class BootstrapTable extends React.Component{
     });
   }
 
+  handleNewBtnClicked() {
+    if(this.props.selectRow.onSelect){
+      this.props.selectRow.onSelect(null, false);
+    }
+  }
+
   handleSearch(searchText){
     this.store.search(searchText);
     let result;
@@ -404,11 +410,14 @@ class BootstrapTable extends React.Component{
                    enableSearch={this.props.search}
                    columns={columns}
                    searchPlaceholder={this.props.searchPlaceholder}
+                   onNewBtnClicked={this.handleNewBtnClicked.bind(this)}
                    onAddRow={this.handleAddRow.bind(this)}
                    onPrepareEditRow={this.handlePrepareEdit.bind(this)}
                    onEditRow={this.handleEditRow.bind(this)}
                    onDropRow={this.handleDropRow.bind(this)}
-                   onSearch={this.handleSearch.bind(this)}/>
+                   onSearch={this.handleSearch.bind(this)}
+                   useExtra={(this.props.extra != undefined)}
+                   extraContent={this.props.extra} />
         </div>
       )
     }else{
