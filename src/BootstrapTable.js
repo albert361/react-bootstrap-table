@@ -162,6 +162,14 @@ class BootstrapTable extends React.Component{
     });
   }
 
+  deSelectAll() {
+    let selectedRowKeys = [];
+    this.store.setSelectedRowKey(selectedRowKeys);
+    this.setState({
+      selectedRowKeys: selectedRowKeys
+    });
+  }
+
   handleSelectAllRow(e){
     var isSelected = e.currentTarget.checked;
     let selectedRowKeys = [];
@@ -404,7 +412,7 @@ class BootstrapTable extends React.Component{
     if(this.props.insertRow || this.props.deleteRow || this.props.search || this.props.editRow){
       return(
         <div className="tool-bar">
-          <ToolBar enableInsert={this.props.insertRow}
+          <ToolBar ref="toolbar" enableInsert={this.props.insertRow}
                    enableEdit={this.props.editRow}
                    enableDelete={this.props.deleteRow}
                    enableSearch={this.props.search}

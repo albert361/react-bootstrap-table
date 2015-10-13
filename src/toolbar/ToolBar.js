@@ -28,6 +28,24 @@ class ToolBar extends React.Component{
         this.refs[column.field+i].getDOMNode().value = '';
       }
     }, this);
+    setTimeout(function() {
+      $('.insertModal .bs-datetime').each(function(idx, ele) {
+        var $input = $(ele);
+        var field = $input.attr('data-field');
+        var d = $input.val();
+        // console.log(d);
+        $input.datetimepicker({
+          stepping: 30,
+        });
+        $input.on('dp.change', function (e) {
+          this.onChange(field, {
+            target: {
+              value: moment(e.date).format("YYYY-MM-DD HH:mm:ss"),
+            },
+          });
+        }.bind(this));
+      }.bind(this));;
+    }.bind(this),0);
   }
 
   handleSaveBtnClick(e){
@@ -68,6 +86,26 @@ class ToolBar extends React.Component{
       }
     }
     this.setState(this.state);
+    setTimeout(function() {
+      $('.insertModal .bs-datetime').each(function(idx, ele) {
+        var $input = $(ele);
+        var field = $input.attr('data-field');
+        var d = $input.val();
+        // console.log(d);
+        $input.datetimepicker({
+          defaultDate: moment(d),
+          stepping: 30,
+        });
+        $input.data("DateTimePicker").date(moment(d));
+        $input.on('dp.change', function (e) {
+          this.onChange(field, {
+            target: {
+              value: moment(e.date).format("YYYY-MM-DD HH:mm:ss"),
+            },
+          });
+        }.bind(this));
+      }.bind(this));;
+    }.bind(this),0);
   }
 
   onChange(field, e) {
@@ -189,6 +227,15 @@ class ToolBar extends React.Component{
                 <textarea ref={column.field+i} className="form-control" rows={column.addOptions.lines} placeholder={column.name} value={this.state.item[column.field]} onChange={this.onChange.bind(this, column.field)}></textarea>
               </div>
             );
+            break;
+          case 'datetime':
+            return (
+              <div className="form-group" key={column.field}>
+                <label>{column.name}</label>
+                <input ref={column.field+i} type="text" className="form-control bs-datetime" data-field={column.field} placeholder={column.name} value={this.state.item[column.field]} onChange={this.onChange.bind(this, column.field)}></input>
+              </div>
+            )
+            break;
         }
       } else {
         return  (
