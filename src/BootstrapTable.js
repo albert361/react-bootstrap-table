@@ -80,6 +80,11 @@ class BootstrapTable extends React.Component{
     }
   }
 
+  componentDidMount() {
+    if (this.refs.toolbar)
+      this.refs.toolbar.componentMounted();
+  }
+
   componentDidUpdate(){
     this._attachCellEditFunc();
     if(this.props.options.afterTableComplete)

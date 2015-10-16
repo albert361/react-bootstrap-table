@@ -12,6 +12,7 @@ class ToolBar extends React.Component{
     this.editMode = false;
     this.state.item = {};
     this.columns = {};
+    this.guid = SiteGlobals.fn.guid();
   }
 
   handleNewBtnClick(e) {
@@ -29,7 +30,7 @@ class ToolBar extends React.Component{
       }
     }, this);
     setTimeout(function() {
-      $('.insertModal .bs-datetime').each(function(idx, ele) {
+      $('#'+this.guid+'.insertModal .bs-datetime').each(function(idx, ele) {
         var $input = $(ele);
         var field = $input.attr('data-field');
         var d = $input.val();
@@ -37,13 +38,6 @@ class ToolBar extends React.Component{
         $input.datetimepicker({
           stepping: 30,
         });
-        $input.on('dp.change', function (e) {
-          this.onChange(field, {
-            target: {
-              value: moment(e.date).format("YYYY-MM-DD HH:mm:ss"),
-            },
-          });
-        }.bind(this));
       }.bind(this));;
     }.bind(this),0);
   }
@@ -70,7 +64,7 @@ class ToolBar extends React.Component{
       this.refs.insertWarningText.getDOMNode().textContent = msg;
     } else{
       this.refs.insertWarning.getDOMNode().style.display = "none";
-      setTimeout(function() {$('.insertModal').modal('hide');}, 0);
+      setTimeout(function() {$('#'+this.guid).modal('hide');}.bind(this), 0);
       this.editMode = false;
       this.state.item = {};
     }
@@ -79,7 +73,11 @@ class ToolBar extends React.Component{
   handleEditBtnClick(e){
     this.editMode = true;
     this.state.item = this.props.onPrepareEditRow();
-    console.log(this.state.item);
+    this.state.unModifiedItem = {};
+    for (var k in this.state.item) {
+      this.state.unModifiedItem[k] = this.state.item[k];
+    }
+    // console.log(this.state.item);
     for (var k in this.state.item) {
       if (this.columns[k] && this.columns[k].addOptions && this.columns[k].addOptions.clearOnEdit) {
         this.state.item[k] = '';
@@ -87,22 +85,29 @@ class ToolBar extends React.Component{
     }
     this.setState(this.state);
     setTimeout(function() {
-      $('.insertModal .bs-datetime').each(function(idx, ele) {
+      $('#'+this.guid+'.insertModal .bs-datetime').each(function(idx, ele) {
         var $input = $(ele);
         var field = $input.attr('data-field');
         var d = $input.val();
         // console.log(d);
         $input.datetimepicker({
-          defaultDate: moment(d),
           stepping: 30,
+          // format: 'YYYY-MM-DD HH:mm:ss',
         });
         $input.data("DateTimePicker").date(moment(d));
         $input.on('dp.change', function (e) {
-          this.onChange(field, {
-            target: {
-              value: moment(e.date).format("YYYY-MM-DD HH:mm:ss"),
-            },
-          });
+          // this.onChange(field, {
+          //   target: {
+          //     value: e.date.utcOffset(0).format("YYYY-MM-DD HH:mm:ss"),
+          //   },
+          // });
+        }.bind(this));
+        $input.on('dp.update', function (e) {
+          // this.onChange(field, {
+          //   target: {
+          //     value: e.date.utcOffset(0).format("YYYY-MM-DD HH:mm:ss"),
+          //   },
+          // });
         }.bind(this));
       }.bind(this));;
     }.bind(this),0);
@@ -117,12 +122,28 @@ class ToolBar extends React.Component{
     this.props.onDropRow();
   }
 
-  handleCloseBtn(e){
+  handleCloseBtn(e) {
+    if (this.editMode) {
+      for (var k in this.state.item) {
+        this.state.item[k] = this.state.unModifiedItem[k];
+      }
+    }
+  }
+
+  handleCloseWarningBtn(e){
     this.refs.warning.getDOMNode().style.display = "none";
   }
 
   handleKeyUp(e){
     this.props.onSearch(e.currentTarget.value);
+  }
+
+  componentMounted() {
+    setTimeout(function() {
+      $('#'+this.guid).on('hide.bs.modal', function(e) {
+        this.handleCloseBtn();
+      }.bind(this));
+    }.bind(this), 0);
   }
 
   render(){
@@ -173,7 +194,7 @@ class ToolBar extends React.Component{
           </div>
         </form>
         <div ref="warning" className="alert alert-warning" style={warningStyle}>
-          <button type="button" className="close" aria-label="Close" onClick={this.handleCloseBtn.bind(this)}><span aria-hidden="true">&times;</span></button>
+          <button type="button" className="close" aria-label="Close" onClick={this.handleCloseWarningBtn.bind(this)}><span aria-hidden="true">&times;</span></button>
           <strong>Warning! </strong><font ref="warningText"></font>
         </div>
         {modal}
@@ -260,7 +281,7 @@ class ToolBar extends React.Component{
       modalExtraClass = extraSettings.modalExtraClass;
     }
     return (
-      <div className={modalClass} tabIndex="-1" role="dialog" aria-hidden="false">
+      <div id={this.guid} className={modalClass} tabIndex="-1" role="dialog" aria-hidden="false">
         <div className="modal-dialog modal-md">
           <div className="modal-content">
             <div className="row">
@@ -278,11 +299,11 @@ class ToolBar extends React.Component{
               </div>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="button" className="btn btn-default" onClick={this.handleCloseBtn.bind(this)} data-dismiss="modal">Close</button>
               <button type="button" className="btn btn-primary" onClick={this.handleSaveBtnClick.bind(this)}>Save</button>
             </div>
             <div ref="insertWarning" className="alert alert-warning" style={warningStyle}>
-              <button type="button" className="close" aria-label="Close" onClick={this.handleCloseBtn.bind(this)}><span aria-hidden="true">&times;</span></button>
+              <button type="button" className="close" aria-label="Close" onClick={this.handleCloseWarningBtn.bind(this)}><span aria-hidden="true">&times;</span></button>
               <strong>Warning! </strong><font ref="insertWarningText"></font>
             </div>
           </div>
