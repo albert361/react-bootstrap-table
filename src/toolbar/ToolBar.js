@@ -71,13 +71,16 @@ class ToolBar extends React.Component{
   }
 
   handleEditBtnClick(e){
-    this.editMode = true;
     this.state.item = this.props.onPrepareEditRow();
+    if (!this.state.item) {
+      e.stopPropagation();
+      return false;
+    }
+    this.editMode = true;
     this.state.unModifiedItem = {};
     for (var k in this.state.item) {
       this.state.unModifiedItem[k] = this.state.item[k];
     }
-    // console.log(this.state.item);
     for (var k in this.state.item) {
       if (this.columns[k] && this.columns[k].addOptions && this.columns[k].addOptions.clearOnEdit) {
         this.state.item[k] = '';
@@ -89,26 +92,10 @@ class ToolBar extends React.Component{
         var $input = $(ele);
         var field = $input.attr('data-field');
         var d = $input.val();
-        // console.log(d);
         $input.datetimepicker({
           stepping: 30,
-          // format: 'YYYY-MM-DD HH:mm:ss',
         });
         $input.data("DateTimePicker").date(moment(d));
-        $input.on('dp.change', function (e) {
-          // this.onChange(field, {
-          //   target: {
-          //     value: e.date.utcOffset(0).format("YYYY-MM-DD HH:mm:ss"),
-          //   },
-          // });
-        }.bind(this));
-        $input.on('dp.update', function (e) {
-          // this.onChange(field, {
-          //   target: {
-          //     value: e.date.utcOffset(0).format("YYYY-MM-DD HH:mm:ss"),
-          //   },
-          // });
-        }.bind(this));
       }.bind(this));;
     }.bind(this),0);
   }
@@ -164,11 +151,11 @@ class ToolBar extends React.Component{
             New</button>:null;
 
     var editBtn = this.props.enableEdit?
-          <button type="button" className="btn btn-warning" data-toggle="modal" data-target={'.'+modalClassName} onClick={this.handleEditBtnClick.bind(this)}>
+          <button type="button" disabled={!this.props.isSelected} className="btn btn-warning" data-toggle="modal" data-target={'.'+modalClassName} onClick={this.handleEditBtnClick.bind(this)}>
             Edit</button>:null;
 
     var deleteBtn = this.props.enableDelete?
-          <button type="button" className="btn btn-danger" data-toggle="tooltip" data-placement="right" title="Delete selected items"
+          <button type="button" disabled={!this.props.isSelected} className="btn btn-danger" data-toggle="tooltip" data-placement="right" title="Delete selected items"
             onClick={this.handleDropRowBtnClick.bind(this)}>
             Delete
           </button>:null;

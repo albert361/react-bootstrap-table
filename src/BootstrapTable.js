@@ -298,8 +298,8 @@ class BootstrapTable extends React.Component{
   handlePrepareEdit(callback) {
     let editRowKeys = this.store.getSelectedRowKeys();
     if (editRowKeys.length != 1) {
-      throw 'Currenty only support one row edit.';
-      return;
+      // throw 'Currenty only support one row edit.';
+      return undefined;
     }
     let item = this.store.getByKey(editRowKeys[0]);
     return item;
@@ -430,6 +430,7 @@ class BootstrapTable extends React.Component{
                    onDropRow={this.handleDropRow.bind(this)}
                    onSearch={this.handleSearch.bind(this)}
                    useExtra={(this.props.extra != undefined)}
+                   isSelected={this.state.selectedRowKeys.length > 0}
                    extraContent={this.props.extra} />
         </div>
       )
