@@ -96,6 +96,13 @@ class ToolBar extends React.Component{
           stepping: 30,
         });
         $input.data("DateTimePicker").date(moment(d));
+        $input.on("dp.change", function (e) {
+          this.onChange(field, {  
+            target: {
+              value: e.date.format("YYYY-MM-DD HH:mm:ss"),
+            },  
+          });  
+        }.bind(this));
       }.bind(this));;
     }.bind(this),0);
   }

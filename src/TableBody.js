@@ -24,70 +24,100 @@ class TableBody extends React.Component{
       'table-condensed': this.props.condensed
     });
 
+    var emptyTable = false;
+    if (this.props.data.length == 0) {
+      // this.props.data.push({
+      //   id: -1,
+      //   // name: 'placeholder',
+      // })
+      emptyTable = true;
+    }
+
     var isSelectRowDefined = this._isSelectRowDefined();
     var tableHeader = this.renderTableHeader(isSelectRowDefined);
 
-    var tableRows = this.props.data.map(function(data, r){
+    if (emptyTable) {
       var tableColumns = this.props.columns.map(function(column, i){
-        var fieldValue = data[column.name];
-        if(this.editing &&
-          column.name !== this.props.keyField && // Key field can't be edit
-          column.editable && // column is editable? default is true, user can set it false
-          this.state.currEditCell != null &&
-          this.state.currEditCell.rid == r &&
-          this.state.currEditCell.cid == i){
-            return(
-              <TableEditColumn completeEdit={this.handleCompleteEditCell.bind(this)}
-                               key={i}
-                               blurToSave={this.props.cellEdit.blurToSave}
-                               rowIndex={r}
-                               colIndex={i}>
-                {fieldValue}
-              </TableEditColumn>
-            )
-        } else{
-          if(typeof column.format !== "undefined"){
-            var formattedValue = column.format(fieldValue, data);
-            if (!React.isValidElement(formattedValue)) {
-              formattedValue = <div dangerouslySetInnerHTML={{__html: formattedValue}}></div>;
-            }
-            return(
-              <TableColumn dataAlign={column.align}
-                           key={i}
-                           className={column.className}
-                           cellEdit={this.props.cellEdit}
-                           onEdit={this.handleEditCell.bind(this)}
-                           width={column.width}>
-                {formattedValue}
-              </TableColumn>
-            )
-          } else{
-            return(
-              <TableColumn dataAlign={column.align}
-                           key={i}
-                           className={column.className}
-                           cellEdit={this.props.cellEdit}
-                           hidden={column.hidden}
-                           onEdit={this.handleEditCell.bind(this)}
-                           width={column.width}>
-                {fieldValue}
-              </TableColumn>
-            )
-          }
-        }
+        var fieldValue = 'N/A';
+        return(
+          <TableColumn dataAlign={column.align}
+                       key={i}
+                       className={column.className}
+                       hidden={column.hidden}
+                       width={column.width}>
+            {fieldValue}
+          </TableColumn>
+        )
       }, this);
-      var selected = this.props.selectedRowKeys.indexOf(data[this.props.keyField]) != -1;
+      var selected = false;
       var selectRowColumn = isSelectRowDefined && !this.props.selectRow.hideSelectColumn?
                               this.renderSelectRowColumn(selected):null;
       return (
-        <TableRow isSelected={selected} key={r}
-          selectRow={isSelectRowDefined?this.props.selectRow:undefined}
-          enableCellEdit={this.props.cellEdit.mode !== Const.CELL_EDIT_NONE}
-          onSelectRow={this.handleSelectRow.bind(this)}>
-          {selectRowColumn}{tableColumns}
-        </TableRow>
+        <h3 className="text-center">No data to display</h3>
       )
-    }, this);
+    } else {
+      var tableRows = this.props.data.map(function(data, r){
+        var tableColumns = this.props.columns.map(function(column, i){
+          var fieldValue = data[column.name];
+          if(this.editing &&
+            column.name !== this.props.keyField && // Key field can't be edit
+            column.editable && // column is editable? default is true, user can set it false
+            this.state.currEditCell != null &&
+            this.state.currEditCell.rid == r &&
+            this.state.currEditCell.cid == i){
+              return(
+                <TableEditColumn completeEdit={this.handleCompleteEditCell.bind(this)}
+                                 key={i}
+                                 blurToSave={this.props.cellEdit.blurToSave}
+                                 rowIndex={r}
+                                 colIndex={i}>
+                  {fieldValue}
+                </TableEditColumn>
+              )
+          } else{
+            if(typeof column.format !== "undefined"){
+              var formattedValue = column.format(fieldValue, data);
+              if (!React.isValidElement(formattedValue)) {
+                formattedValue = <div dangerouslySetInnerHTML={{__html: formattedValue}}></div>;
+              }
+              return(
+                <TableColumn dataAlign={column.align}
+                             key={i}
+                             className={column.className}
+                             cellEdit={this.props.cellEdit}
+                             onEdit={this.handleEditCell.bind(this)}
+                             width={column.width}>
+                  {formattedValue}
+                </TableColumn>
+              )
+            } else{
+              return(
+                <TableColumn dataAlign={column.align}
+                             key={i}
+                             className={column.className}
+                             cellEdit={this.props.cellEdit}
+                             hidden={column.hidden}
+                             onEdit={this.handleEditCell.bind(this)}
+                             width={column.width}>
+                  {fieldValue}
+                </TableColumn>
+              )
+            }
+          }
+        }, this);
+        var selected = this.props.selectedRowKeys.indexOf(data[this.props.keyField]) != -1;
+        var selectRowColumn = isSelectRowDefined && !this.props.selectRow.hideSelectColumn?
+                                this.renderSelectRowColumn(selected):null;
+        return (
+          <TableRow isSelected={selected} key={r}
+            selectRow={isSelectRowDefined?this.props.selectRow:undefined}
+            enableCellEdit={this.props.cellEdit.mode !== Const.CELL_EDIT_NONE}
+            onSelectRow={this.handleSelectRow.bind(this)}>
+            {selectRowColumn}{tableColumns}
+          </TableRow>
+        )
+      }, this);
+    }
 
     if(tableRows.length === 0){
       tableRows.push(
