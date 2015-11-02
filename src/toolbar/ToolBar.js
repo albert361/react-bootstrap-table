@@ -216,6 +216,7 @@ class ToolBar extends React.Component{
               <div className="form-group" key={column.field}>
                 <label>{column.name}</label>
                 <select ref={column.field+i} className="form-control">
+                <option value={-1}></option>
                 {addOptions.selects.map(function (val, idx) {
                   if (val.id == this.state.item[column.field]) {
                     return (<option value={val.id} selected="selected">{val.name}</option>);

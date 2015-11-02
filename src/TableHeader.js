@@ -45,7 +45,7 @@ class TableHeader extends React.Component{
       <div className={containerClasses}>
         <table className="table table-bordered">
           <thead>
-            <tr ref="header" className="success">
+            <tr ref="header" className="warning">
               {selectRowHeaderCol}
               {this.props.children}
             </tr>
