@@ -277,7 +277,7 @@ class ToolBar extends React.Component{
     }
     return (
       <div id={this.guid} className={modalClass} tabIndex="-1" role="dialog" aria-hidden="false">
-        <div className="modal-dialog modal-md">
+        <div className="modal-dialog modal-lg">
           <div className="modal-content">
             <div className="row">
               <div className={modalItemsClass}>
