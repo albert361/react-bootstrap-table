@@ -53,7 +53,7 @@ class TableBody extends React.Component{
       var selectRowColumn = isSelectRowDefined && !this.props.selectRow.hideSelectColumn?
                               this.renderSelectRowColumn(selected):null;
       return (
-        <h3 className="text-center">No data to display</h3>
+        <h3 className="empty-placeholder text-center">No data to display</h3>
       )
     } else {
       var tableRows = this.props.data.map(function(data, r){
