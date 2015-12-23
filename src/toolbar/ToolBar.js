@@ -34,7 +34,6 @@ class ToolBar extends React.Component{
         var $input = $(ele);
         var field = $input.attr('data-field');
         var d = $input.val();
-        // console.log(d);
         $input.datetimepicker({
           stepping: 30,
         });
@@ -137,6 +136,11 @@ class ToolBar extends React.Component{
       $('#'+this.guid).on('hide.bs.modal', function(e) {
         this.handleCloseBtn();
       }.bind(this));
+      $('#'+this.guid).on('shown.bs.modal', function(e) {
+        if (this.props.onModalShown) {
+          this.props.onModalShown();
+        }
+      }.bind(this))
     }.bind(this), 0);
   }
 

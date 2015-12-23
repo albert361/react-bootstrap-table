@@ -430,6 +430,7 @@ class BootstrapTable extends React.Component{
                    onDropRow={this.handleDropRow.bind(this)}
                    onSearch={this.handleSearch.bind(this)}
                    useExtra={(this.props.extra != undefined)}
+                   onModalShown={this.props.onModalShown}
                    isSelected={this.state.selectedRowKeys.length > 0}
                    extraContent={this.props.extra} />
         </div>
